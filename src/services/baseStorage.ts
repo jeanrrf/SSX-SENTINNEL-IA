@@ -17,14 +17,9 @@ export abstract class BaseStorage<T extends BaseEntity> {
     protected metadata: StorageMetadata;
 
     constructor(storageKey: string) {
-        this.storageKey = storageKey;
+        // Sempre usar o prefixo do Jean
+        this.storageKey = `jean_${storageKey}`;
         this.metadata = this.initializeMetadata();
-
-        // Define prefixo único por usuário
-        const userId = localStorage.getItem('user_id');
-        if (userId) {
-            this.storageKey = `${userId}_${this.storageKey}`;
-        }
     }
 
     protected initializeMetadata(): StorageMetadata {
@@ -36,18 +31,57 @@ export abstract class BaseStorage<T extends BaseEntity> {
             version: '1.0.0',
             environment: (process.env.NODE_ENV || 'development') as 'development' | 'production',
             lastUpdate: new Date().toISOString(),
+            userId: 'jean',
             dataSize: 0
         };
     }
 
     getAll(): T[] {
-        const items = localStorage.getItem(this.storageKey);
-        return items ? JSON.parse(items) : [];
+        try {
+            const items = localStorage.getItem(this.storageKey);
+            return items ? JSON.parse(items) : [];
+        } catch (error) {
+            console.error('Erro ao ler dados:', error);
+            return [];
+        }
     }
 
     protected saveItems(items: T[]): void {
-        localStorage.setItem(this.storageKey, JSON.stringify(items));
-        this.updateMetadata();
+        try {
+            localStorage.setItem(this.storageKey, JSON.stringify(items));
+            this.updateMetadata(items.length);
+        } catch (error) {
+            console.error('Erro ao salvar dados:', error);
+        }
+    }
+
+    protected updateMetadata(dataSize: number): void {
+        this.metadata = {
+            ...this.metadata,
+            lastUpdate: new Date().toISOString(),
+            dataSize
+        };
+        localStorage.setItem(`${this.storageKey}_metadata`, JSON.stringify(this.metadata));
+    }
+
+    getById(id: number): T | undefined {
+        return this.getAll().find(item => item.id === id);
+    }
+
+    clear(): void {
+        localStorage.removeItem(this.storageKey);
+        localStorage.removeItem(`${this.storageKey}_metadata`);
+        this.metadata = this.initializeMetadata();
+    }
+
+    protected validateEntity(entity: T): boolean {
+        return (
+            typeof entity === 'object' &&
+            entity !== null &&
+            'id' in entity &&
+            'createdAt' in entity &&
+            'updatedAt' in entity
+        );
     }
 
     abstract save(item: Omit<T, 'id' | 'createdAt' | 'updatedAt'>): T;
@@ -67,22 +101,6 @@ export abstract class BaseStorage<T extends BaseEntity> {
         const items = this.getAll();
         const filteredItems = items.filter(item => item.id !== id);
         this.saveItems(filteredItems);
-    }
-
-    getById(id: number): T | undefined {
-        const items = this.getAll();
-        return items.find(item => item.id === id);
-    }
-
-    clear(): void {
-        localStorage.removeItem(this.storageKey);
-        localStorage.removeItem(`${this.storageKey}_metadata`);
-        this.metadata = this.initializeMetadata();
-    }
-
-    protected updateMetadata(): void {
-        this.metadata.lastUpdate = new Date().toISOString();
-        localStorage.setItem(`${this.storageKey}_metadata`, JSON.stringify(this.metadata));
     }
 
     getMetadata(): StorageMetadata {
