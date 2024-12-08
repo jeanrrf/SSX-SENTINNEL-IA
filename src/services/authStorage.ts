@@ -1,120 +1,129 @@
 import { BaseStorage } from './baseStorage';
-import type { User } from '../types/index';
-import { performanceMonitor } from '../utils/performance';
+
+interface User {
+    id: number;
+    username: string;
+    password: string;
+    createdAt: string;
+    updatedAt: string;
+    role: 'admin' | 'tester';
+    prefix: string;
+}
 
 class AuthStorage extends BaseStorage<User> {
-    private static readonly STORAGE_KEY = 'sentinel_users';
-    private currentUser: User | null = null;
-    private readonly MAX_LOGIN_ATTEMPTS = 3;
-    private loginAttempts: Record<string, { count: number; lastAttempt: number }> = {};
-    private readonly LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutos
+    private static readonly MAX_LOGIN_ATTEMPTS = 3;
+    private loginAttempts: number = 0;
+    private lockoutTime: number | null = null;
 
     constructor() {
-        super(AuthStorage.STORAGE_KEY);
-        this.initializeData();
-        this.checkLoggedUser();
+        super('auth');
+        this.initializeUsers();
     }
 
-    login(username: string, password: string): boolean {
-        const startTime = performanceMonitor.startOperation();
-        
+    private initializeUsers() {
+        const users = this.getAll();
+        if (users.length === 0) {
+            // Adicionar usuário admin
+            this.save({
+                username: 'jean',
+                password: '31676685',
+                role: 'admin',
+                prefix: 'jean'
+            } as Omit<User, 'id' | 'createdAt' | 'updatedAt'>);
+
+            // Adicionar usuários convidados
+            this.save({
+                username: 'paulo',
+                password: 'convidado@auth1',
+                role: 'tester',
+                prefix: 'paulo'
+            } as Omit<User, 'id' | 'createdAt' | 'updatedAt'>);
+
+            this.save({
+                username: 'dercilei',
+                password: 'convidado@auth2',
+                role: 'tester',
+                prefix: 'dercilei'
+            } as Omit<User, 'id' | 'createdAt' | 'updatedAt'>);
+        }
+    }
+
+    login(username: string, password: string): { success: boolean; message: string; user?: User } {
         try {
-            // Verificar tentativas de login
-            if (this.isLockedOut(username)) {
-                throw new Error('Conta temporariamente bloqueada. Tente novamente mais tarde.');
-            }
-
-            // Verificar credenciais fixas
-            if (username === 'Jean' && password === '31676685') {
-                this.currentUser = {
-                    id: 1,
-                    username: 'Jean',
-                    password: '31676685',
-                    isAdmin: true,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    failedLoginAttempts: 0
+            // Verificar bloqueio
+            if (this.isLocked()) {
+                const remainingTime = Math.ceil((this.lockoutTime! - Date.now()) / 1000);
+                return {
+                    success: false,
+                    message: `Conta bloqueada. Tente novamente em ${remainingTime} segundos.`
                 };
-                localStorage.setItem('user_id', '1');
-                this.resetLoginAttempts(username);
-                return true;
             }
 
-            this.recordLoginAttempt(username);
-            throw new Error('Usuário ou senha inválidos');
+            const users = this.getAll();
+            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+
+            if (!user || user.password !== password) {
+                this.loginAttempts++;
+                
+                if (this.loginAttempts >= AuthStorage.MAX_LOGIN_ATTEMPTS) {
+                    this.lockAccount();
+                    return {
+                        success: false,
+                        message: 'Conta bloqueada por 5 minutos devido a múltiplas tentativas.'
+                    };
+                }
+
+                return {
+                    success: false,
+                    message: `Credenciais inválidas. Tentativas restantes: ${AuthStorage.MAX_LOGIN_ATTEMPTS - this.loginAttempts}`
+                };
+            }
+
+            // Login bem sucedido
+            this.loginAttempts = 0;
+            this.lockoutTime = null;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+
+            return {
+                success: true,
+                message: 'Login realizado com sucesso!',
+                user
+            };
         } catch (error) {
-            console.error('Erro no login:', error);
-            return false;
-        } finally {
-            performanceMonitor.endOperation('login', startTime);
+            console.error('Erro ao fazer login:', error);
+            return {
+                success: false,
+                message: 'Erro ao processar login. Tente novamente.'
+            };
         }
-    }
-
-    private isLockedOut(username: string): boolean {
-        const attempts = this.loginAttempts[username];
-        if (!attempts) return false;
-
-        const now = Date.now();
-        if (attempts.count >= this.MAX_LOGIN_ATTEMPTS &&
-            now - attempts.lastAttempt < this.LOCKOUT_DURATION) {
-            return true;
-        }
-
-        // Resetar se o tempo de bloqueio passou
-        if (now - attempts.lastAttempt >= this.LOCKOUT_DURATION) {
-            this.resetLoginAttempts(username);
-        }
-
-        return false;
-    }
-
-    private recordLoginAttempt(username: string): void {
-        const attempts = this.loginAttempts[username] || { count: 0, lastAttempt: 0 };
-        attempts.count++;
-        attempts.lastAttempt = Date.now();
-        this.loginAttempts[username] = attempts;
-    }
-
-    private resetLoginAttempts(username: string): void {
-        delete this.loginAttempts[username];
-    }
-
-    logout(): void {
-        this.currentUser = null;
-        localStorage.removeItem('user_id');
     }
 
     getCurrentUser(): User | null {
-        return this.currentUser;
-    }
-
-    isLoggedIn(): boolean {
-        return this.currentUser !== null;
-    }
-
-    private checkLoggedUser(): void {
-        const userId = localStorage.getItem('user_id');
-        if (userId === '1') {
-            this.currentUser = {
-                id: 1,
-                username: 'Jean',
-                password: '31676685',
-                isAdmin: true,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                failedLoginAttempts: 0
-            };
-        } else {
-            this.logout();
+        try {
+            const userStr = localStorage.getItem('currentUser');
+            return userStr ? JSON.parse(userStr) : null;
+        } catch (error) {
+            console.error('Erro ao obter usuário atual:', error);
+            return null;
         }
     }
 
-    private initializeData(): void {
-        // Método mantido para compatibilidade com a classe base
+    logout(): void {
+        localStorage.removeItem('currentUser');
     }
 
-    save(): never {
-        throw new Error('Não é permitido criar novos usuários');
+    private isLocked(): boolean {
+        if (!this.lockoutTime) return false;
+        if (Date.now() > this.lockoutTime) {
+            this.loginAttempts = 0;
+            this.lockoutTime = null;
+            return false;
+        }
+        return true;
+    }
+
+    private lockAccount(): void {
+        this.lockoutTime = Date.now() + (5 * 60 * 1000); // 5 minutos
     }
 }
 

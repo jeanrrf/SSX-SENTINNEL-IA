@@ -11,66 +11,26 @@ class TaskStorage extends BaseStorage<Task> {
     }
 
     getAll(): Task[] {
-        try {
-            return this.getItems() || [];
-        } catch (error) {
-            console.error('Error getting tasks:', error);
-            return [];
-        }
+        return super.getAll();
     }
 
     save(task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Task {
-        try {
-            const items = this.getAll();
-            const newTask: Task = {
-                ...task,
-                id: Date.now(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                timeSpent: task.timeSpent || 0
-            };
-            items.push(newTask);
-            this.saveItems(items);
-            this.updateProjectTimes();
-            return newTask;
-        } catch (error) {
-            console.error('Error saving task:', error);
-            throw new Error('Failed to save task');
-        }
+        const newTask = super.save({
+            ...task,
+            timeSpent: task.timeSpent || 0
+        });
+        this.updateProjectTimes();
+        return newTask;
     }
 
     update(task: Task): Task {
-        try {
-            const items = this.getAll();
-            const index = items.findIndex(t => t.id === task.id);
-            
-            if (index === -1) {
-                throw new Error('Task not found');
-            }
-
-            const updatedTask: Task = {
-                ...task,
-                updatedAt: new Date().toISOString()
-            };
-
-            items[index] = updatedTask;
-            this.saveItems(items);
-            this.updateProjectTimes();
-            return updatedTask;
-        } catch (error) {
-            console.error('Error updating task:', error);
-            throw new Error('Failed to update task');
-        }
+        const updatedTask = super.update(task);
+        this.updateProjectTimes();
+        return updatedTask;
     }
 
     getById(id: number): Task | undefined {
-        try {
-            const items = this.getAll();
-            return items.find(task => task.id === id);
-        } catch (error) {
-            console.error('Error getting task by ID:', error);
-            return undefined;
-        }
+        return super.getById(id);
     }
 
     getByProjectId(projectId: number): Task[] {
@@ -83,14 +43,8 @@ class TaskStorage extends BaseStorage<Task> {
     }
 
     delete(id: number): void {
-        try {
-            const items = this.getAll().filter(task => task.id !== id);
-            this.saveItems(items);
-            this.updateProjectTimes();
-        } catch (error) {
-            console.error('Error deleting task:', error);
-            throw new Error('Failed to delete task');
-        }
+        super.delete(id);
+        this.updateProjectTimes();
     }
 
     updateTimeSpent(taskId: number, timeSpent: number): void {

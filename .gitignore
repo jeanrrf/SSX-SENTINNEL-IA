@@ -47,3 +47,6 @@ out
 *.pem
 .vercel
 .netlify
+
+# Local documentation
+INSTRUCOES.md

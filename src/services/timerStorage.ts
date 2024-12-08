@@ -39,7 +39,7 @@ class TimerStorage extends BaseStorage<TimerEntry> {
             };
 
             // Salvar e definir como timer atual
-            const entry = this.save(newEntry);
+            const entry = super.save(newEntry);
             localStorage.setItem(this.CURRENT_TIMER_KEY, JSON.stringify(entry));
 
             return entry;
@@ -67,8 +67,7 @@ class TimerStorage extends BaseStorage<TimerEntry> {
                 updatedAt: new Date().toISOString()
             };
 
-            this.update(updatedTimer);
-            return updatedTimer;
+            return super.update(updatedTimer);
         } catch (error) {
             console.error('Error stopping timer:', error);
             return null;
@@ -77,7 +76,7 @@ class TimerStorage extends BaseStorage<TimerEntry> {
 
     getByTaskId(taskId: number): TimerEntry[] {
         try {
-            return this.getItems()?.filter(timer => timer.taskId === taskId) || [];
+            return this.getAll().filter(timer => timer.taskId === taskId);
         } catch (error) {
             console.error('Error getting timers by task ID:', error);
             return [];
@@ -108,24 +107,6 @@ class TimerStorage extends BaseStorage<TimerEntry> {
             console.error('Error formatting total time:', error);
             return '00:00:00';
         }
-    }
-
-    save(timer: Omit<TimerEntry, 'id' | 'createdAt' | 'updatedAt'>): TimerEntry {
-        const items = this.getAll();
-        const newTimer: TimerEntry = {
-            ...timer,
-            id: Date.now(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-        items.push(newTimer);
-        this.saveItems(items);
-        return newTimer;
-    }
-
-    override clear(): void {
-        localStorage.removeItem(this.storageKey);
-        localStorage.removeItem(this.CURRENT_TIMER_KEY);
     }
 }
 

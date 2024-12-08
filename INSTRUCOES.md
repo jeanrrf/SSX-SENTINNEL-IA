@@ -1,8 +1,26 @@
 # Instruções para Manutenção do Site SENTINNELL WORKSTATION
 
+## 👥 Usuários do Sistema
+
+### Administrador
+- Username: `jean`
+- Senha: `31676685`
+- Acesso total ao sistema
+
+### Usuários Convidados
+1. **Paulo**
+   - Username: `paulo`
+   - Senha: `convidado@auth1`
+   - Limite de armazenamento: 50MB
+
+2. **Dercilei**
+   - Username: `dercilei`
+   - Senha: `convidado@auth2`
+   - Limite de armazenamento: 50MB
+
 ## 🌐 Links Importantes
 - Site publicado: https://jeanrrf.github.io/SSX-SENTINNEL-IA/
-- Repositório GitHub: https://github.com/jeanrrf/SSX-SENTINELL-IA
+- Repositório GitHub: https://github.com/jeanrrf/SSX-SENTINNEL-IA
 
 ## 💻 Arquivos Locais
 Os arquivos do site estão em:
