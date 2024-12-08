@@ -11,67 +11,103 @@ interface TimerEntry {
 }
 
 class TimerStorage extends BaseStorage<TimerEntry> {
-    private readonly CURRENT_TIMER_KEY = 'current_timer';
+    private readonly CURRENT_TIMER_KEY = 'jean_current_timer';
 
     constructor() {
         super('timers');
     }
 
     getCurrentTimer(): TimerEntry | null {
-        const currentTimer = localStorage.getItem(this.CURRENT_TIMER_KEY);
-        return currentTimer ? JSON.parse(currentTimer) : null;
+        try {
+            const currentTimer = localStorage.getItem(this.CURRENT_TIMER_KEY);
+            return currentTimer ? JSON.parse(currentTimer) : null;
+        } catch (error) {
+            console.error('Error getting current timer:', error);
+            return null;
+        }
     }
 
     startTimer(taskId: number): TimerEntry {
-        // Parar timer atual se existir
-        this.stopCurrentTimer();
+        try {
+            // Parar timer atual se existir
+            this.stopCurrentTimer();
 
-        // Criar nova entrada de timer
-        const newEntry: Omit<TimerEntry, 'id' | 'createdAt' | 'updatedAt'> = {
-            taskId,
-            startTime: new Date().toISOString()
-        };
+            // Criar nova entrada de timer
+            const newEntry: Omit<TimerEntry, 'id' | 'createdAt' | 'updatedAt'> = {
+                taskId,
+                startTime: new Date().toISOString()
+            };
 
-        // Salvar e definir como timer atual
-        const entry = this.save(newEntry);
-        localStorage.setItem(this.CURRENT_TIMER_KEY, JSON.stringify(entry));
+            // Salvar e definir como timer atual
+            const entry = this.save(newEntry);
+            localStorage.setItem(this.CURRENT_TIMER_KEY, JSON.stringify(entry));
 
-        return entry;
+            return entry;
+        } catch (error) {
+            console.error('Error starting timer:', error);
+            throw new Error('Failed to start timer');
+        }
     }
 
     stopCurrentTimer(): TimerEntry | null {
-        const currentTimer = this.getCurrentTimer();
-        if (!currentTimer) return null;
+        try {
+            const currentTimer = this.getCurrentTimer();
+            if (!currentTimer) return null;
 
-        // Limpar timer atual
-        localStorage.removeItem(this.CURRENT_TIMER_KEY);
+            // Limpar timer atual
+            localStorage.removeItem(this.CURRENT_TIMER_KEY);
 
-        // Se já tem endTime, não precisa atualizar
-        if (currentTimer.endTime) return currentTimer;
+            // Se já tem endTime, não precisa atualizar
+            if (currentTimer.endTime) return currentTimer;
 
-        // Atualizar entrada com endTime
-        const updatedEntry = {
-            ...currentTimer,
-            endTime: new Date().toISOString()
-        };
+            // Atualizar com horário de término
+            const updatedTimer: TimerEntry = {
+                ...currentTimer,
+                endTime: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
 
-        return this.update(updatedEntry);
+            this.update(updatedTimer);
+            return updatedTimer;
+        } catch (error) {
+            console.error('Error stopping timer:', error);
+            return null;
+        }
     }
 
-    getTaskTotalTime(taskId: number): number {
-        const entries = this.getAll();
-        const taskEntries = entries.filter(entry => entry.taskId === taskId);
-
-        return taskEntries.reduce((total, entry) => {
-            const startTime = new Date(entry.startTime).getTime();
-            const endTime = entry.endTime ? new Date(entry.endTime).getTime() : Date.now();
-            return total + (endTime - startTime);
-        }, 0);
+    getByTaskId(taskId: number): TimerEntry[] {
+        try {
+            return this.getItems()?.filter(timer => timer.taskId === taskId) || [];
+        } catch (error) {
+            console.error('Error getting timers by task ID:', error);
+            return [];
+        }
     }
 
-    formatTaskTime(taskId: number): string {
-        const totalTime = this.getTaskTotalTime(taskId);
-        return formatDuration(totalTime);
+    calculateTotalTime(taskId: number): number {
+        try {
+            const entries = this.getByTaskId(taskId);
+            return entries.reduce((total, entry) => {
+                if (!entry.endTime) return total;
+                
+                const start = new Date(entry.startTime).getTime();
+                const end = new Date(entry.endTime).getTime();
+                return total + (end - start);
+            }, 0);
+        } catch (error) {
+            console.error('Error calculating total time:', error);
+            return 0;
+        }
+    }
+
+    formatTotalTime(taskId: number): string {
+        try {
+            const totalMs = this.calculateTotalTime(taskId);
+            return formatDuration(totalMs);
+        } catch (error) {
+            console.error('Error formatting total time:', error);
+            return '00:00:00';
+        }
     }
 
     save(timer: Omit<TimerEntry, 'id' | 'createdAt' | 'updatedAt'>): TimerEntry {
