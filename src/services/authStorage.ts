@@ -25,25 +25,24 @@ class AuthStorage extends BaseStorage<User> {
                 throw new Error('Conta temporariamente bloqueada. Tente novamente mais tarde.');
             }
 
-            const users = this.getAll();
-            const user = users.find(u => u.username === username);
-
-            if (!user) {
-                this.recordLoginAttempt(username);
-                throw new Error('Usuário ou senha inválidos');
+            // Verificar credenciais fixas
+            if (username === 'Jean' && password === '31676685') {
+                this.currentUser = {
+                    id: 1,
+                    username: 'Jean',
+                    password: '31676685',
+                    isAdmin: true,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    failedLoginAttempts: 0
+                };
+                localStorage.setItem('user_id', '1');
+                this.resetLoginAttempts(username);
+                return true;
             }
 
-            // Em produção, isso deve usar uma função de hash segura
-            if (user.password !== password) {
-                this.recordLoginAttempt(username);
-                throw new Error('Usuário ou senha inválidos');
-            }
-
-            // Login bem-sucedido
-            this.currentUser = user;
-            localStorage.setItem('user_id', String(user.id));
-            this.resetLoginAttempts(username);
-            return true;
+            this.recordLoginAttempt(username);
+            throw new Error('Usuário ou senha inválidos');
         } catch (error) {
             console.error('Erro no login:', error);
             return false;
@@ -96,56 +95,28 @@ class AuthStorage extends BaseStorage<User> {
 
     private checkLoggedUser(): void {
         const userId = localStorage.getItem('user_id');
-        if (userId) {
-            const user = this.getById(Number(userId));
-            if (user) {
-                this.currentUser = user;
-            } else {
-                this.logout();
-            }
+        if (userId === '1') {
+            this.currentUser = {
+                id: 1,
+                username: 'Jean',
+                password: '31676685',
+                isAdmin: true,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                failedLoginAttempts: 0
+            };
+        } else {
+            this.logout();
         }
     }
 
     private initializeData(): void {
-        if (this.initialized) return;
-
-        try {
-            const existingData = this.getAll();
-            if (existingData.length === 0) {
-                // Criar usuário padrão
-                const defaultAdmin: User = {
-                    id: 1,
-                    username: import.meta.env.VITE_DEFAULT_USERNAME || 'Jean',
-                    password: import.meta.env.VITE_DEFAULT_PASSWORD || '31676685',
-                    isAdmin: true,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    failedLoginAttempts: 0
-                };
-                this.saveItems([defaultAdmin]);
-                console.log('AuthStorage: Usuário padrão criado');
-            }
-            
-            this.initialized = true;
-        } catch (error) {
-            console.error('AuthStorage: Erro ao inicializar dados:', error);
-            this.clear();
-            this.initialized = true;
-        }
+        // Não precisa inicializar nada, pois as credenciais são fixas
+        this.initialized = true;
     }
 
-    save(user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): User {
-        const items = this.getAll();
-        const newUser: User = {
-            ...user,
-            id: Date.now(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            failedLoginAttempts: 0
-        };
-        items.push(newUser);
-        this.saveItems(items);
-        return newUser;
+    save(): never {
+        throw new Error('Não é permitido criar novos usuários');
     }
 }
 
