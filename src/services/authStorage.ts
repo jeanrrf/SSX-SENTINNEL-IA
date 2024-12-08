@@ -108,6 +108,10 @@ class AuthStorage extends BaseStorage<User> {
         }
     }
 
+    isLoggedIn(): boolean {
+        return !!this.getCurrentUser();
+    }
+
     logout(): void {
         localStorage.removeItem('currentUser');
     }

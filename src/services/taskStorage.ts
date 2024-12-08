@@ -42,6 +42,15 @@ class TaskStorage extends BaseStorage<Task> {
         }
     }
 
+    getByClientId(clientId: number): Task[] {
+        try {
+            return this.getAll().filter(task => task.clientId === clientId);
+        } catch (error) {
+            console.error('Error getting tasks by client ID:', error);
+            return [];
+        }
+    }
+
     delete(id: number): void {
         super.delete(id);
         this.updateProjectTimes();

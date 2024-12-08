@@ -83,6 +83,21 @@ class TimerStorage extends BaseStorage<TimerEntry> {
         }
     }
 
+    getTaskTotalTime(taskId: number): number {
+        try {
+            const entries = this.getAll().filter(entry => entry.taskId === taskId);
+            return entries.reduce((total, entry) => {
+                if (!entry.endTime) return total;
+                const start = new Date(entry.startTime).getTime();
+                const end = new Date(entry.endTime).getTime();
+                return total + (end - start);
+            }, 0);
+        } catch (error) {
+            console.error('Error calculating task total time:', error);
+            return 0;
+        }
+    }
+
     calculateTotalTime(taskId: number): number {
         try {
             const entries = this.getByTaskId(taskId);
