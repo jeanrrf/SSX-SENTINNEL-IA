@@ -4,7 +4,6 @@ import { performanceMonitor } from '../utils/performance';
 
 class AuthStorage extends BaseStorage<User> {
     private static readonly STORAGE_KEY = 'sentinel_users';
-    private initialized = false;
     private currentUser: User | null = null;
     private readonly MAX_LOGIN_ATTEMPTS = 3;
     private loginAttempts: Record<string, { count: number; lastAttempt: number }> = {};
@@ -111,8 +110,7 @@ class AuthStorage extends BaseStorage<User> {
     }
 
     private initializeData(): void {
-        // Não precisa inicializar nada, pois as credenciais são fixas
-        this.initialized = true;
+        // Método mantido para compatibilidade com a classe base
     }
 
     save(): never {
