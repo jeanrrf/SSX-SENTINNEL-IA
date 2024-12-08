@@ -81,7 +81,7 @@ class TaskStorage extends BaseStorage<Task> {
                 if (project) {
                     projectStorage.update({
                         ...project,
-                        totalTimeSpent: timeSpent
+                        timeSpent: timeSpent
                     });
                 }
             });
