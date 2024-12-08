@@ -1,0 +1,239 @@
+/* Estilos base */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --blur-effect: blur(10px);
+}
+
+body {
+  background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Header e navegação */
+.sentinel-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: var(--blur-effect);
+  -webkit-backdrop-filter: var(--blur-effect);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.sentinel-nav-button {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-effect);
+  -webkit-backdrop-filter: var(--blur-effect);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: white;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.sentinel-nav-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Container principal */
+.sentinel-content {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: var(--blur-effect);
+  -webkit-backdrop-filter: var(--blur-effect);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  margin: 2rem;
+  padding: 2rem;
+  min-height: calc(100vh - 160px);
+}
+
+/* Cards */
+.sentinel-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: var(--blur-effect);
+  -webkit-backdrop-filter: var(--blur-effect);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  height: 100%;
+  aspect-ratio: 3/2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: white;
+}
+
+.sentinel-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--glass-shadow);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Gradientes específicos com transparência */
+.sentinel-gradient-blue {
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.1) 0%, rgba(191, 219, 254, 0.2) 100%);
+}
+
+.sentinel-gradient-green {
+  background: linear-gradient(135deg, rgba(220, 252, 231, 0.1) 0%, rgba(187, 247, 208, 0.2) 100%);
+}
+
+.sentinel-gradient-purple {
+  background: linear-gradient(135deg, rgba(243, 232, 255, 0.1) 0%, rgba(233, 213, 255, 0.2) 100%);
+}
+
+/* Grid e Layout */
+.sentinel-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.sentinel-section-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sentinel-card-value {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+
+.sentinel-card-label {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sentinel-card {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .sentinel-content {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .sentinel-dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .sentinel-card {
+    aspect-ratio: 16/9;
+  }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Estilos adicionais */
+.bg-pattern {
+  background-color: #0f172a;
+  background-image: 
+    radial-gradient(at 47% 33%, hsl(222, 47%, 11%) 0, transparent 59%), 
+    radial-gradient(at 82% 65%, hsl(218, 41%, 20%) 0, transparent 55%);
+  position: relative;
+  min-height: 100vh;
+}
+
+.bg-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(90deg, #0f172a 21px, transparent 1%) center,
+    linear-gradient(#0f172a 21px, transparent 1%) center,
+    rgba(145, 166, 198, 0.05);
+  background-size: 22px 22px;
+  z-index: 0;
+}
+
+.banner {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.page-container {
+  position: relative;
+  z-index: 1;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  transition: all 0.3s ease;
+  font-size: 16px;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px);
+}
+
+/* Gradientes para os cards */
+.gradient-blue {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, rgba(21, 128, 61, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, rgba(109, 40, 217, 0.1) 0%, rgba(147, 51, 234, 0.05) 100%);
+}

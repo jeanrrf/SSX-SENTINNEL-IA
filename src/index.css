@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.logo-text {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.logo-text::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(45deg, 
+    rgba(255,255,255,0.1) 0%,
+    rgba(255,255,255,0) 50%,
+    rgba(255,255,255,0.1) 100%
+  );
+  filter: blur(1px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.logo-text:hover::after {
+  opacity: 1;
+}
+
+.logo-glow {
+  position: relative;
+  overflow: hidden;
+  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+}
+
+.logo-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: hdShine 3s linear infinite;
+  background-size: 200% 100%;
+}
+
+@keyframes hdShine {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.logo-shield {
+  position: relative;
+}
+
+.logo-shield::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1));
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.logo-shield:hover::after {
+  opacity: 1;
+}
