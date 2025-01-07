@@ -14,6 +14,10 @@ export interface Client extends BaseEntity {
     company: string;
     status: 'active' | 'inactive';
     notes: string;
+    /**
+     * Metadata related to the task, which can include any additional information
+     * that is not covered by the other properties.
+     */
     metadata?: Record<string, unknown>;
     projects?: number[]; // IDs dos projetos associados ao cliente
     tasks?: number[]; // IDs das tarefas associadas ao cliente      
@@ -76,11 +80,11 @@ export interface Project extends BaseEntity {
     startDate: string;
     endDate: string;
     progress: number;
-    team: string[];
+    // Tags associated with the task, e.g., ['urgent', 'backend', 'UI']
+    tags?: string[];
     timeSpent: number;
     metadata?: Record<string, unknown>;
     priority?: 'low' | 'medium' | 'high';
-    tags?: string[];
 }
 
 // Tarefa
@@ -89,11 +93,12 @@ export interface Task extends BaseEntity {
     description: string;
     clientId: number;
     projectId: number;
-    status: 'todo' | 'doing' | 'done';
+    status: 'to_do' | 'in_progress' | 'completed' | 'review' | 'blocked';
     priority: 'low' | 'medium' | 'high';
     dueDate: string;
     timeSpent: number;
     assignedTo?: string[];
+    // IDs of tasks that this task depends on
     dependencies?: number[];
     metadata?: Record<string, unknown>;
     tags?: string[];
@@ -122,7 +127,7 @@ export interface DashboardStats {
     totalProjects: number;
     totalTasks: number;
     completedTasks: number;
-    totalTimeSpent: string;
+    totalTimeSpent: number;
     activeTimers: number;
     projectsProgress: { [key: string]: number };
     tasksPriority: { [key: string]: number };

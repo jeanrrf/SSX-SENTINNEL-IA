@@ -14,7 +14,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onClose, onSave }) => {
     const [formData, setFormData] = useState({
         title: task?.title || '',
         description: task?.description || '',
-        status: task?.status || 'todo',
+        status: task?.status || 'to_do',
         priority: task?.priority || 'medium',
         projectId: task?.projectId || 0,
         clientId: task?.clientId || 0,
@@ -134,11 +134,11 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onClose, onSave }) => {
                                 border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500
                                 hover:border-gray-600 transition-colors duration-300"
                         >
-                            <option value="backlog" className="bg-gray-900">Backlog</option>
-                            <option value="todo" className="bg-gray-900">A Fazer</option>
+                            <option value="to_do" className="bg-gray-900">A Fazer</option>
                             <option value="in_progress" className="bg-gray-900">Em Progresso</option>
-                            <option value="in_review" className="bg-gray-900">Em Revisão</option>
-                            <option value="done" className="bg-gray-900">Concluído</option>
+                            <option value="review" className="bg-gray-900">Em Revisão</option>
+                            <option value="completed" className="bg-gray-900">Concluído</option>
+                            <option value="blocked" className="bg-gray-900">Bloqueado</option>
                         </select>
                     </div>
 
