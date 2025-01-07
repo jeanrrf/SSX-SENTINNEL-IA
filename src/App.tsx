@@ -45,9 +45,6 @@ const App = () => {
         { id: 'database', icon: FaChartBar, label: 'Database' }
     ];
 
-    const data = {}; // Replace with actual data
-    const columns: Array<{ key: string; label: string }> = []; // Replace with actual columns
-
     return (
         <div className="flex h-screen bg-gray-900 text-white">
             <Sidebar
@@ -73,7 +70,7 @@ const App = () => {
                         <Route path="/projects" element={<ProjectsSection />} />
                         <Route path="/tasks" element={<TasksSection />} />
                         <Route path="/reports" element={<ReportsSection />} />
-                        <Route path="/database" element={<DatabaseViewer data={data} columns={columns} />} />
+                        <Route path="/database" element={<DatabaseViewer />} />
                         <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
                 </div>

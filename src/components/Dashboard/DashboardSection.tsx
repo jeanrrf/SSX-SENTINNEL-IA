@@ -5,6 +5,7 @@ import { clientStorage } from '../../services/clientStorage';
 import { projectStorage } from '../../services/projectStorage';
 import { taskStorage } from '../../services/taskStorage';
 import { Task, Project, Client, DashboardStats } from '../../types';
+import { formatDuration } from '../../utils/timeUtils';
 
 const DashboardSection: React.FC = () => {
     const [stats, setStats] = useState<DashboardStats>({
@@ -192,7 +193,7 @@ const DashboardSection: React.FC = () => {
                     </div>
                     <div>
                         <p className="text-gray-400 text-sm">Tempo Total</p>
-                        <p className="text-2xl font-bold text-gray-100">{stats.totalTimeSpent}</p>
+                        <p className="text-2xl font-bold text-gray-100">{formatDuration(stats.totalTimeSpent)}</p>
                     </div>
                 </div>
             </div>

@@ -4,8 +4,8 @@ import { formatDuration } from '../utils/timeUtils';
 interface TimerEntry {
     id: number;
     taskId: number;
-    startTime: string;
-    endTime?: string;
+    startTime: number; // Convert to seconds
+    endTime?: number; // Convert to seconds
     createdAt: string;
     updatedAt: string;
 }
@@ -35,7 +35,7 @@ class TimerStorage extends BaseStorage<TimerEntry> {
             // Criar nova entrada de timer
             const newEntry: Omit<TimerEntry, 'id' | 'createdAt' | 'updatedAt'> = {
                 taskId,
-                startTime: new Date().toISOString()
+                startTime: Math.floor(Date.now() / 1000) // Convert to seconds
             };
 
             // Salvar e definir como timer atual
@@ -63,7 +63,7 @@ class TimerStorage extends BaseStorage<TimerEntry> {
             // Atualizar com horário de término
             const updatedTimer: TimerEntry = {
                 ...currentTimer,
-                endTime: new Date().toISOString(),
+                endTime: Math.floor(Date.now() / 1000), // Convert to seconds
                 updatedAt: new Date().toISOString()
             };
 
@@ -85,13 +85,13 @@ class TimerStorage extends BaseStorage<TimerEntry> {
 
     getTaskTotalTime(taskId: number): number {
         try {
-            const entries = this.getAll().filter(entry => entry.taskId === taskId);
-            return entries.reduce((total, entry) => {
-                if (!entry.endTime) return total;
-                const start = new Date(entry.startTime).getTime();
-                const end = new Date(entry.endTime).getTime();
-                return total + (end - start);
-            }, 0);
+            const currentTimer = this.getCurrentTimer();
+            if (!currentTimer || currentTimer.taskId !== taskId) {
+                return 0;
+            }
+
+            const now = Math.floor(Date.now() / 1000); // Convert to seconds
+            return now - currentTimer.startTime;
         } catch (error) {
             console.error('Error calculating task total time:', error);
             return 0;
@@ -104,9 +104,7 @@ class TimerStorage extends BaseStorage<TimerEntry> {
             return entries.reduce((total, entry) => {
                 if (!entry.endTime) return total;
                 
-                const start = new Date(entry.startTime).getTime();
-                const end = new Date(entry.endTime).getTime();
-                return total + (end - start);
+                return total + (entry.endTime - entry.startTime);
             }, 0);
         } catch (error) {
             console.error('Error calculating total time:', error);
@@ -117,7 +115,7 @@ class TimerStorage extends BaseStorage<TimerEntry> {
     formatTotalTime(taskId: number): string {
         try {
             const totalMs = this.calculateTotalTime(taskId);
-            return formatDuration(totalMs);
+            return formatDuration(totalMs * 1000); // Convert to milliseconds
         } catch (error) {
             console.error('Error formatting total time:', error);
             return '00:00:00';

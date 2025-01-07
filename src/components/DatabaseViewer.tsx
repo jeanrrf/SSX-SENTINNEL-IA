@@ -1,88 +1,63 @@
-import React, { useEffect, useState } from 'react';
-import { openDatabase } from '../utils/database';
+import React from 'react';
+import { clientStorage } from '../services/clientStorage';
+import { projectStorage } from '../services/projectStorage';
+import { taskStorage } from '../services/taskStorage';
 
 interface DatabaseViewerProps {
-    data: Record<string, unknown>;
-    columns: Array<{ key: string; label: string }>;
+  data?: Record<string, unknown>;
+  columns?: Array<{ key: string; label: string }>;
 }
 
 const DatabaseViewer: React.FC<DatabaseViewerProps> = () => {
-    const [events, setEvents] = useState<any[]>([]);
-    const [errors, setErrors] = useState<any[]>([]);
+  const getAllData = () => {
+    const clients = clientStorage.getAll();
+    const projects = projectStorage.getAll();
+    const tasks = taskStorage.getAll();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const db = await openDatabase();
-            const eventsResult = db.exec('SELECT * FROM analytics_events');
-            const errorsResult = db.exec('SELECT * FROM error_logs');
-            const events = eventsResult[0]?.values || [];
-            const errors = errorsResult[0]?.values || [];
-            setEvents(events);
-            setErrors(errors);
-        };
+    return {
+      clients,
+      projects,
+      tasks
+    };
+  };
 
-        fetchData();
-    }, []);
+  const data = getAllData();
 
-    return (
-        <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">Analytics Events</h2>
-            <table className="min-w-full bg-white">
-                <thead>
-                    <tr>
-                        <th className="py-2">ID</th>
-                        <th className="py-2">Category</th>
-                        <th className="py-2">Action</th>
-                        <th className="py-2">Label</th>
-                        <th className="py-2">Value</th>
-                        <th className="py-2">Metadata</th>
-                        <th className="py-2">Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {events.map(event => (
-                        <tr key={event[0]}>
-                            <td className="py-2">{event[0]}</td>
-                            <td className="py-2">{event[1]}</td>
-                            <td className="py-2">{event[2]}</td>
-                            <td className="py-2">{event[3]}</td>
-                            <td className="py-2">{event[4]}</td>
-                            <td className="py-2">{event[5]}</td>
-                            <td className="py-2">{new Date(event[6]).toLocaleString()}</td>
-                        </tr>
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6 text-gray-200">Database Viewer</h1>
+      
+      {Object.entries(data).map(([category, items]) => (
+        <div key={category} className="mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-gray-300">{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
+          <div className="bg-gray-800 rounded-lg shadow overflow-x-auto">
+            <table className="min-w-full">
+              <thead>
+                <tr className="bg-gray-700">
+                  {Object.keys((items as any[])[0] || {}).map(header => (
+                    <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-gray-800 divide-y divide-gray-700">
+                {(items as any[]).map((item, index) => (
+                  <tr key={index} className="hover:bg-gray-700">
+                    {Object.values(item).map((value, i) => (
+                      <td key={i} className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                        {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                      </td>
                     ))}
-                </tbody>
+                  </tr>
+                ))}
+              </tbody>
             </table>
-
-            <h2 className="text-xl font-bold mt-8 mb-4">Error Logs</h2>
-            <table className="min-w-full bg-white">
-                <thead>
-                    <tr>
-                        <th className="py-2">ID</th>
-                        <th className="py-2">Message</th>
-                        <th className="py-2">Stack</th>
-                        <th className="py-2">Context</th>
-                        <th className="py-2">Severity</th>
-                        <th className="py-2">Code</th>
-                        <th className="py-2">Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {errors.map(error => (
-                        <tr key={error[0]}>
-                            <td className="py-2">{error[0]}</td>
-                            <td className="py-2">{error[1]}</td>
-                            <td className="py-2">{error[2]}</td>
-                            <td className="py-2">{error[3]}</td>
-                            <td className="py-2">{error[4]}</td>
-                            <td className="py-2">{error[5]}</td>
-                            <td className="py-2">{new Date(error[6]).toLocaleString()}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+          </div>
         </div>
-    );
+      ))}
+    </div>
+  );
 };
 
 export default DatabaseViewer;

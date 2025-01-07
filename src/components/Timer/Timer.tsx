@@ -48,8 +48,7 @@ export const Timer: React.FC = () => {
 
         if (isRunning && selectedTaskId) {
             interval = setInterval(() => {
-                const newTime = elapsedTime + 1;
-                setElapsedTime(newTime);
+                setElapsedTime(prevTime => prevTime + 1);
             }, 1000);
         }
 
@@ -58,7 +57,7 @@ export const Timer: React.FC = () => {
                 clearInterval(interval);
             }
         };
-    }, [isRunning, selectedTaskId, elapsedTime]);
+    }, [isRunning, selectedTaskId]);
 
     const handleStart = () => {
         if (!selectedTaskId) {

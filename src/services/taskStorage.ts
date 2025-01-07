@@ -63,9 +63,10 @@ class TaskStorage extends BaseStorage<Task> {
                 throw new Error('Task not found');
             }
 
+            // Ensure timeSpent is treated as seconds
             this.update({
                 ...task,
-                timeSpent
+                timeSpent: Math.floor(timeSpent) // Ensure we store whole seconds
             });
         } catch (error) {
             console.error('Error updating time spent:', error);
