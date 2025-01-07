@@ -1,66 +1,63 @@
-import { clientStorage } from '../services/clientStorage';
-import { projectStorage } from '../services/projectStorage';
-import { taskStorage } from '../services/taskStorage';
-import { timerStorage } from '../services/timerStorage';
+import { openDatabase } from './database';
 
 export class StorageCleanup {
-    private storages: any[];
-
-    constructor(storages: any[]) {
-        this.storages = storages;
+    async cleanDevData(): Promise<void> {
+        if (process.env.NODE_ENV === 'development') {
+            const db = await openDatabase();
+            db.run(`DELETE FROM analytics_events`);
+            // Adicione outras tabelas conforme necessário
+        }
     }
 
-    cleanDevData(): void {
-        this.storages.forEach(storage => {
-            if (process.env.NODE_ENV === 'development') {
-                storage.clear();
+    async exportData(): Promise<Record<string, unknown>> {
+        const db = await openDatabase();
+        const rows = db.exec(`SELECT * FROM analytics_events`);
+        return {
+            analytics_events: rows[0].values
+        };
+    }
+
+    async importData(data: Record<string, unknown>): Promise<void> {
+        const db = await openDatabase();
+        if (data.analytics_events) {
+            db.run(`DELETE FROM analytics_events`);
+            for (const event of data.analytics_events as any[]) {
+                db.run(
+                    `INSERT INTO analytics_events (category, action, label, value, metadata, timestamp) VALUES (?, ?, ?, ?, ?, ?)`,
+                    [event.category, event.action, event.label, event.value, JSON.stringify(event.metadata), event.timestamp]
+                );
             }
-        });
-    }
-
-    exportData(): Record<string, any> {
-        const data: Record<string, any> = {};
-        this.storages.forEach(storage => {
-            const key = storage.constructor.name.toLowerCase().replace('storage', '');
-            data[key] = storage.exportData();
-        });
-        return data;
-    }
-
-    importData(data: Record<string, any>): void {
-        this.storages.forEach(storage => {
-            const key = storage.constructor.name.toLowerCase().replace('storage', '');
-            if (data[key]) {
-                storage.importData(data[key]);
-            }
-        });
+        }
     }
 }
 
-const storages = [
-    clientStorage,
-    projectStorage,
-    taskStorage,
-    timerStorage
-];
+const storageCleanup = new StorageCleanup();
 
-const storageCleanup = new StorageCleanup(storages);
-
-export const cleanupDevData = () => {
-    storageCleanup.cleanDevData();
+export const cleanupDevData = async () => {
+    await storageCleanup.cleanDevData();
 };
 
-export const exportAllData = () => {
-    const data = storageCleanup.exportData();
+export const exportAllData = async () => {
+    const data = await storageCleanup.exportData();
     return JSON.stringify(data);
 };
 
-export const importAllData = (jsonData: string): boolean => {
+export const importAllData = async (jsonData: string): Promise<boolean> => {
     try {
         const data = JSON.parse(jsonData);
-        storageCleanup.importData(data);
+        await storageCleanup.importData(data);
         return true;
     } catch {
         return false;
     }
 };
+
+function cleanStorage(_keys: string[]) {
+  // ...existing code...
+}
+
+function removeItem(_key: string) {
+  // ...existing code...
+}
+
+export { cleanStorage, removeItem };

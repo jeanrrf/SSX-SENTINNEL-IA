@@ -22,70 +22,6 @@ interface Task {
   assignedTo: string;
 }
 
-// Dados de exemplo para desenvolvimento
-const sampleProjects: Project[] = [
-  {
-    id: 1,
-    name: "Redesign Website",
-    clientId: 1,
-    status: "em_andamento",
-    startDate: "2024-01-01",
-    endDate: "2024-03-31",
-    budget: 25000,
-    hoursLogged: 120
-  },
-  {
-    id: 2,
-    name: "App Mobile",
-    clientId: 2,
-    status: "em_andamento",
-    startDate: "2024-02-01",
-    endDate: "2024-06-30",
-    budget: 50000,
-    hoursLogged: 80
-  },
-  {
-    id: 3,
-    name: "Sistema ERP",
-    clientId: 1,
-    status: "concluido",
-    startDate: "2023-10-01",
-    endDate: "2024-01-31",
-    budget: 75000,
-    hoursLogged: 450
-  }
-];
-
-const sampleTasks: Task[] = [
-  {
-    id: 1,
-    projectId: 1,
-    title: "Design da Homepage",
-    status: "em_progresso",
-    priority: "alta",
-    dueDate: "2024-02-15",
-    assignedTo: "Maria Silva"
-  },
-  {
-    id: 2,
-    projectId: 1,
-    title: "Implementação do Backend",
-    status: "pendente",
-    priority: "media",
-    dueDate: "2024-03-01",
-    assignedTo: "João Santos"
-  },
-  {
-    id: 3,
-    projectId: 2,
-    title: "Desenvolvimento da API",
-    status: "em_progresso",
-    priority: "alta",
-    dueDate: "2024-03-15",
-    assignedTo: "Carlos Oliveira"
-  }
-];
-
 // Funções auxiliares
 const calculateProjectMetrics = (projects: Project[]) => {
   const totalBudget = projects.reduce((sum, project) => sum + project.budget, 0);
@@ -116,18 +52,18 @@ const calculateTaskMetrics = (tasks: Task[]) => {
 export const dashboardService = {
   getProjectData: () => {
     // Em um ambiente real, isso viria do backend
-    return sampleProjects;
+    return [];
   },
 
   getTaskData: () => {
     // Em um ambiente real, isso viria do backend
-    return sampleTasks;
+    return [];
   },
 
   getDashboardMetrics: () => {
     const clients = clientStorage.getAll();
-    const projects = dashboardService.getProjectData();
-    const tasks = dashboardService.getTaskData();
+    const projects: Project[] = dashboardService.getProjectData();
+    const tasks: Task[] = dashboardService.getTaskData();
 
     const projectMetrics = calculateProjectMetrics(projects);
     const taskMetrics = calculateTaskMetrics(tasks);

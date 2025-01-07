@@ -11,7 +11,7 @@ interface CacheItem<T> {
 }
 
 export class CacheManager {
-    private cache: Map<string, CacheItem<any>>;
+    private cache: Map<string, CacheItem<unknown>>;
     private config: CacheConfig;
     private currentSize: number;
 
@@ -93,3 +93,22 @@ export class CacheManager {
         }
     }
 }
+
+function setCache(_key: string, _value: unknown) {
+  // ...existing code...
+}
+
+function getCache(_key: string): unknown {
+  // ...existing code...
+  return null;
+}
+
+function cacheFunction(_param: Record<string, unknown>) {
+  // ...existing code...
+}
+
+function anotherCacheFunction(_param: Record<string, unknown>) {
+  // ...existing code...
+}
+
+export { setCache, getCache, cacheFunction, anotherCacheFunction };

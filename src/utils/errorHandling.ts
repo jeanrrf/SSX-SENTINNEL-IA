@@ -1,11 +1,12 @@
 import * as Sentry from '@sentry/react';
+import { openDatabase } from './database';
 
 export class AppError extends Error {
     constructor(
         message: string,
         public code: string,
         public severity: 'low' | 'medium' | 'high' | 'critical' = 'medium',
-        public context?: Record<string, any>
+        public context?: Record<string, unknown>
     ) {
         super(message);
         this.name = 'AppError';
@@ -22,7 +23,7 @@ export const initErrorTracking = () => {
     }
 };
 
-export const logError = (error: Error | AppError, context?: Record<string, any>) => {
+export const logError = async (error: Error | AppError, context?: Record<string, unknown>) => {
     const errorDetails = {
         message: error.message,
         stack: error.stack,
@@ -44,5 +45,16 @@ export const logError = (error: Error | AppError, context?: Record<string, any>)
         });
     }
 
+    // Armazenar no banco de dados
+    const db = await openDatabase();
+    db.run(
+        `INSERT INTO error_logs (message, stack, context, severity, code, timestamp) VALUES (?, ?, ?, ?, ?, ?)`,
+        [errorDetails.message, errorDetails.stack || '', JSON.stringify(errorDetails.context), errorDetails.severity, errorDetails.code, errorDetails.timestamp]
+    );
+
     return errorDetails;
+};
+
+export const handleError = async (error: Error, context: Record<string, unknown>) => {
+    await logError(error, context);
 };
