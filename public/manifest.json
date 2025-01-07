@@ -1,8 +1,8 @@
 {
-  "name": "SENTINNELL WORKSTATION - Gestão Inteligente de Estações de Trabalho",
-  "short_name": "SENTINNELL WS",
-  "description": "Plataforma avançada de gerenciamento e monitoramento de estações de trabalho",
-  "start_url": "/",
+  "name": "Your App Name",
+  "short_name": "App",
+  "description": "Your app description",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0052CC",
