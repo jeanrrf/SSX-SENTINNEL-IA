@@ -4,7 +4,6 @@ import { FaUsers, FaProjectDiagram, FaTasks, FaCheckCircle, FaClock } from 'reac
 import { clientStorage } from '../../services/clientStorage';
 import { projectStorage } from '../../services/projectStorage';
 import { taskStorage } from '../../services/taskStorage';
-import { formatDuration } from '../../utils/timeUtils';
 import { Task, Project, Client, DashboardStats } from '../../types';
 
 const DashboardSection: React.FC = () => {
@@ -13,7 +12,7 @@ const DashboardSection: React.FC = () => {
         totalProjects: 0,
         totalTasks: 0,
         completedTasks: 0,
-        totalTimeSpent: '0h',
+        totalTimeSpent: 0,
         activeTimers: 0,
         projectsProgress: {},
         tasksPriority: {}
@@ -45,9 +44,9 @@ const DashboardSection: React.FC = () => {
                 setProjectsMap(projectsMap);
 
                 // Carregar tarefas
+                // Carregar tarefas
                 const tasks = taskStorage.getAll();
-                const completedTasks = tasks.filter(task => task.status === 'done').length;
-
+                const completedTasks = tasks.filter(task => task.status === 'completed').length;
                 // Calcular tempo total
                 const totalSeconds = tasks.reduce((total, task) => {
                     return total + (task.timeSpent || 0);
@@ -61,7 +60,7 @@ const DashboardSection: React.FC = () => {
                 // Pegar tarefas próximas (próximas 5)
                 const upcomingTasks = tasks
                     .filter(task => {
-                        if (!task.dueDate || task.status === 'done') return false;
+                        if (!task.dueDate || task.status === 'completed') return false;
                         const dueDate = new Date(task.dueDate);
                         return dueDate > new Date();
                     })
@@ -78,7 +77,7 @@ const DashboardSection: React.FC = () => {
                     totalProjects: projectsList.length,
                     totalTasks: tasks.length,
                     completedTasks,
-                    totalTimeSpent: formatDuration(totalSeconds),
+                    totalTimeSpent: totalSeconds,
                     activeTimers: 0,
                     projectsProgress: {},
                     tasksPriority: {}

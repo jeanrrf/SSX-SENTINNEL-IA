@@ -85,6 +85,7 @@ export interface Project extends BaseEntity {
     timeSpent: number;
     metadata?: Record<string, unknown>;
     priority?: 'low' | 'medium' | 'high';
+    team: string[]; // Add team property
 }
 
 // Tarefa

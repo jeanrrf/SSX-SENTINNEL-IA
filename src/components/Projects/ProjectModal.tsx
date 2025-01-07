@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { Project, Client } from '../../types';
+import { Project, Client, ProjectFormData } from '../../types';
 import { clientStorage } from '../../services/clientStorage';
-
-type ProjectFormData = Omit<Project, 'id' | 'createdAt' | 'updatedAt'>;
 
 interface ProjectModalProps {
     project?: Project;

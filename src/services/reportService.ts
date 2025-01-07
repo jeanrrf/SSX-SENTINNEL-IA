@@ -100,7 +100,7 @@ class ReportService {
                 clientId: client.id,
                 clientName: client.name,
                 totalTasks: allTasks.length,
-                completedTasks: allTasks.filter(t => t.status === 'done').length,
+                completedTasks: allTasks.filter(t => t.status === 'completed').length, // Update status value
                 totalTime,
                 formattedTime: formatDuration(totalTime),
                 projects
@@ -189,3 +189,10 @@ class ReportService {
 }
 
 export const reportService = new ReportService();
+
+function generateReport(tasks: Task[]): { completedTasks: number } {
+    const completedTasks = tasks.filter(task => task.status === 'completed').length;
+    return { completedTasks };
+}
+
+export { generateReport };

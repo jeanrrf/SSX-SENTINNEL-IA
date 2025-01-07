@@ -15,9 +15,9 @@ interface KanbanColumn {
 }
 
 const KANBAN_COLUMNS: KanbanColumn[] = [
-    { title: 'A Fazer', status: 'todo' },
-    { title: 'Em Andamento', status: 'doing' },
-    { title: 'Concluído', status: 'done' }
+    { title: 'A Fazer', status: 'to_do' },
+    { title: 'Em Progresso', status: 'in_progress' },
+    { title: 'Concluído', status: 'completed' }
 ];
 
 const TasksSection: React.FC = () => {
@@ -90,9 +90,11 @@ const TasksSection: React.FC = () => {
     // Cor da coluna
     const getColumnColor = (status: Task['status']): string => {
         const colors: Record<Task['status'], string> = {
-            'todo': 'bg-blue-500',
-            'doing': 'bg-yellow-500',
-            'done': 'bg-green-500'
+            'to_do': 'bg-blue-500',
+            'in_progress': 'bg-yellow-500',
+            'completed': 'bg-green-500',
+            'review': 'bg-purple-500',
+            'blocked': 'bg-red-500'
         };
         return colors[status];
     };
