@@ -1,3 +1,4 @@
+// Este arquivo foi substituído por timerStorageSQLite.ts
 import { BaseStorage } from './baseStorage';
 import { formatDuration } from '../utils/timeUtils';
 

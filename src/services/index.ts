@@ -1,5 +1,5 @@
 export { authStorage } from './authStorage';
 export { clientStorage } from './clientStorage';
 export { projectStorage } from './projectStorage';
-export { taskStorage } from './taskStorage';
-export { timerStorage } from './timerStorage';
+export { taskStorageSQLite as taskStorage } from '../storage/taskStorageSQLite';
+export { timerStorageSQLite as timerStorage } from '../storage/timerStorageSQLite';

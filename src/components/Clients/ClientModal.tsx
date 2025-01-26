@@ -21,7 +21,7 @@ export const ClientModal: React.FC<ClientModalProps> = ({ client, onClose, onSav
         notes: client?.notes || ''
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         onSave(formData);
     };

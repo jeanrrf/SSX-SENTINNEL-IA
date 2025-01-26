@@ -2,9 +2,10 @@ import { openDatabase } from '../utils/database';
 import { Client } from '../types';
 
 class ClientStorageSQLite {
-    private db: any;
+    private db: import('sqlite3').Database | undefined;
 
     constructor() {
+        this.db = undefined;
         this.init();
     }
 
@@ -29,7 +30,7 @@ class ClientStorageSQLite {
 
     async getAll(): Promise<Client[]> {
         const result = this.db.exec(`SELECT * FROM clients`);
-        return result[0?.values.map((row: any) => this.mapRowToClient(row)) || [];
+        return result[0]?.values.map((row: unknown) => this.mapRowToClient(row as Client)) || [];
     }
 
     async save(client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>): Promise<Client> {
@@ -45,7 +46,7 @@ class ClientStorageSQLite {
     async update(client: Client): Promise<Client> {
         const now = new Date().toISOString();
         const stmt = this.db.prepare(`
-            UPDATE clients SET name = ?, email = ?, phone, address = ?, company = ?, status = ?, notes = ?, metadata = ?, updatedAt = ?
+            UPDATE clients SET name = ?, email = ?, phone = ?, address = ?, company = ?, status = ?, notes = ?, metadata = ?, updatedAt = ?
             WHERE id = ?
         `);
         stmt.run(client.name, client.email, client.phone, client.address, client.company, client.status, client.notes, JSON.stringify(client.metadata), now, client.id);
@@ -53,27 +54,27 @@ class ClientStorageSQLite {
     }
 
     async getById(id: number): Promise<Client | undefined> {
-        const result = this.db.exec(`SELECT * FROM clients WHERE id = ?`, [id]);
-        return result[0]?.values.map((row: any) => this.mapRowToClient(row))[0];
+        const result = this.db?.exec(`SELECT * FROM clients WHERE id = ?`, [id]);
+        return result?.[0]?.values.map((row: { [key: string]: string }) => this.mapRowToClient(row))[0];
     }
 
     async delete(id: number): Promise<void> {
         this.db.exec(`DELETE FROM clients WHERE id = ?`, [id]);
     }
 
-    private mapRowToClient(row: any): Client {
+    private mapRowToClient(row: { [key: string]: string }): Client {
         return {
-            id: row[0],
-            name: row[1],
-            email: row[2],
-            phone: row[3],
-            address: row[4],
-            company: row[5],
-            status: row[6],
-            notes: row[7],
-            metadata: JSON.parse(row[8]),
-            createdAt: row[9],
-            updatedAt: row[10]
+            id: row.id,
+            name: row.name,
+            email: row.email,
+            phone: row.phone,
+            address: row.address,
+            company: row.company,
+            status: row.status,
+            notes: row.notes,
+            metadata: JSON.parse(row.metadata),
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt
         };
     }
 }

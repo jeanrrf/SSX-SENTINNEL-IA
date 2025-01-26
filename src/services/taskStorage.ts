@@ -1,3 +1,4 @@
+// Este arquivo foi substituído por taskStorageSQLite.ts
 import { BaseStorage } from './baseStorage';
 import { Task } from '../types';
 import { projectStorage } from './projectStorage';
