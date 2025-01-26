@@ -44,6 +44,7 @@ export const ClientModal: React.FC<ClientModalProps> = ({ client, onClose, onSav
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                        title="Fechar"
                     >
                         <FaTimes className="text-gray-400 hover:text-white" />
                     </button>
@@ -139,10 +140,11 @@ export const ClientModal: React.FC<ClientModalProps> = ({ client, onClose, onSav
 
                     {/* Status */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label htmlFor="status" className="block text-sm font-medium text-gray-300 mb-2">
                             Status
                         </label>
                         <select
+                            id="status"
                             name="status"
                             value={formData.status}
                             onChange={handleChange}

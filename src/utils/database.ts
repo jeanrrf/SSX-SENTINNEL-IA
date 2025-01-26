@@ -1,13 +1,13 @@
-import initSqlJs, { Database } from 'sql.js';
-
-let db: Database | null = null;
+import * as SQLite from 'sqlite3';
 
 export async function openDatabase() {
-  if (!db) {
-    const SQL = await initSqlJs({
-      locateFile: file => `path/to/${file}` // Ensure this path is correct
+    return new Promise<SQLite.Database>((resolve, reject) => {
+        const db = new SQLite.Database(':memory:', (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(db);
+            }
+        });
     });
-    db = new SQL.Database();
-  }
-  return db;
 }
